@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+</head>
+<body ng-app="myapp" ng-controller="mycontroller">
+	<div class="container col-md-12">
+		<form ng-submit="send(user)">
+			<label>name:</label>
+			<input type="text" ng-model="user.name">
+			<br>
+			<br>
+			<label>rollno:</label>
+			<input type="text" ng-model="user.rollno" >
+			<br>
+			<br>
+			<label>branch</label>
+			<input type="text" ng-model="user.branch" ng-init="get()"><br><br>
+			<input type="submit" >
+		</form>
+		<div>
+			<table>
+				<thead>
+					<th>SNO</th>
+					<th>NAME</th>
+					<th>ROLLNO</th>
+					<th>BRANCH</th>
+					<th>edit</th>
+					<th>delete</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="member in users">
+						<td>{{$index+1|number}}</td>
+						<td ><p ng-hide="userhide">{{member.name}}</p>
+							<input ng-show="userhide"  type="text" ng-model="user.name"></td>
+							<td ><p ng-hide="userhide" >{{member.rollno}} </p>
+								<input ng-show="userhide" type="text" ng-model="user.rollno"></td>
+								<td><p  ng-hide="userhide">{{member.branch}} </p>
+									<input ng-show="userhide"type="text" ng-model="user.branch"></td>
+									<td>
+										<button ng-hide="userhide" ng-click="userhide=false;edit(user)">edit</button></td>
+										<td>
+											<button ng-hide="userhide" ng-click="userhide=true;update(user);">update</button>
+										</td>
+										<td>
+											<button>delete</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</body>
+					<script>
+						var app=angular.module("myapp",[])
+						app.controller("mycontroller",function($scope,postdata,getdata,updatee){
+							$scope.users=[]
+							$scope.user={}
+							$scope.send=function(val){
+								console.log(val);
+								$scope.users.push(val);
+								postdata.postingdata(val);
+								$scope.user={};
+							}
+
+							$scope.get=function(){
+								getdata.gettingdata().then(function(data){
+									if(data){
+										$scope.users = data
+									}
+									else{
+										$scope.users = []
+									}
+								})
+							}
+							$scope.update=function(){
+								updatee.updatedata(val).then(function(data){
+									if(data){
+										$scope.users = data
+									}
+									else{
+										$scope.users = []
+									}
+								})
+							}
+						});
+
+
+						app.service('postdata', function($http){
+							return{
+								postingdata:function(value){
+									console.log(value)
+									$http({
+										url:'/postdata',
+										method:'post',
+										data:value,
+									}).then(function(success){
+										console.log(success)
+										alert("success inserted")
+									}, function(error){
+										console.log(error)
+										alert(error.data)
+									})
+								}
+							}
+						})
+						app.factory('getdata',function($http){
+							return{
+								gettingdata:function(){
+									dattas=$http({
+										method:'get',
+										url:'/getdata'
+									}).then(function(response){
+										console.log(response.data)
+										return response.data
+									})
+									return dattas
+								}
+							}
+						})
+
+						app.service('updatee', function($http){
+							return{
+								updatedata:function(value){
+									console.log(value)
+									$http({
+										url:'/update',
+										method:'post',
+										data:value,
+									}).then(function(success){
+										console.log(success)
+										alert("success inserted")
+									}, function(error){
+										console.log(error)
+										alert(error.data)
+									})
+								}
+							}
+						})
+					</script>
+					</html>
